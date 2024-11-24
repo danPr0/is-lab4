@@ -52,6 +52,7 @@ class ScheduleCSP:
     def calculate_quality(self, assignment):
         windows_penalty = 0
         room_size_penalty = 0
+        teacher_inter_penalty = 0
 
         schedules = {"teachers": {}, "groups": {}}
         for entry in assignment:
@@ -77,7 +78,11 @@ class ScheduleCSP:
             if group_size > room_capacity:
                 room_size_penalty += 1
 
-        total_penalty = windows_penalty + room_size_penalty
+            teacher_subjects = next(filter(lambda x: x['teacher'] == entry['teacher'], self.teachers))['subjects'].split(';')
+            if entry['subject'] not in teacher_subjects:
+                teacher_inter_penalty += 1
+
+        total_penalty = windows_penalty + room_size_penalty + teacher_inter_penalty
         return - total_penalty
 
     def backtrack(self, domains, assignment=[]):
